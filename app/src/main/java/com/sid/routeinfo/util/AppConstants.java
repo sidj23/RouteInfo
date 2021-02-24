@@ -6,6 +6,6 @@ public class AppConstants {
 
     public static final String BASE_URL = "https://open-app1.herokuapp.com/";
 
-    public static final String PREF_NAME = "musik_wiki_preference";
+    public static final String PREF_NAME = "route_info_preference";
 
 }

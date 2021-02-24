@@ -1,5 +1,6 @@
 package com.sid.routeinfo.model;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
@@ -13,11 +14,10 @@ import java.util.List;
 @Entity(tableName = "route_info")
 public class RouteInfo {
 
-    @PrimaryKey(autoGenerate = true)
-    private int uniqueId;
-
     @SerializedName("id")
     @Expose
+    @PrimaryKey
+    @NonNull
     private String id;
     @SerializedName("name")
     @Expose
@@ -92,13 +92,5 @@ public class RouteInfo {
 
     public void setRouteTimeDataList(List<RouteTimeData> routeTimeDataList) {
         this.routeTimeDataList = routeTimeDataList;
-    }
-
-    public int getUniqueId() {
-        return uniqueId;
-    }
-
-    public void setUniqueId(int uniqueId) {
-        this.uniqueId = uniqueId;
     }
 }
