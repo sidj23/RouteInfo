@@ -20,6 +20,8 @@ public class TripDataAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private List<RouteInfo> routeInfoList = new ArrayList<>();
     private Context context;
 
+    // This Adapter is used for showing the RouteInfo of different bus/route
+
     public TripDataAdapter(List<RouteInfo> routeInfoList, Context context) {
         this.routeInfoList = routeInfoList;
         this.context = context;
@@ -42,7 +44,6 @@ public class TripDataAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         return routeInfoList.size();
     }
 
-
     private class RouteInfoViewHolder extends BaseViewHolder {
 
         private ItemRouteInfoBinding routeInfoBinding;
@@ -53,6 +54,7 @@ public class TripDataAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             this.routeInfoBinding = routeInfoBinding;
         }
 
+        // We have also added an another recycler view for showing the route timing.
         @Override
         public void onBind(int position) {
             tripDataViewModel = new TripDataViewModel(routeInfoList.get(position));

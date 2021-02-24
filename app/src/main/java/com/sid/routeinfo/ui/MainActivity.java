@@ -2,10 +2,10 @@ package com.sid.routeinfo.ui;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         setUpDataSource();
     }
 
+
+    // Here I have added the checks of network Connection and check the availability of the cache data.
     private void setUpDataSource() {
         if (preferenceHelper.isRouteDataAvailable()) {
             getDataFromDb();
@@ -70,13 +72,15 @@ public class MainActivity extends AppCompatActivity {
                 makeApiCall();
             } else {
                 setNoDataAvailable();
+                Toast.makeText(this, "NO Internet Connection Please Try Again Later", Toast.LENGTH_LONG).show();
             }
         }
 
     }
 
-    private void makeApiCall() {
+    // This Method is used for making API call to get the Route Data
 
+    private void makeApiCall() {
         new CompositeDisposable().add(apiInterface.makeGetApiForRouteData()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -86,9 +90,10 @@ public class MainActivity extends AppCompatActivity {
                     if (!preferenceHelper.isRouteDataAvailable())
                         setNoDataAvailable();
                 }));
-
     }
 
+
+    // The response has come in the String format because we have to get Route timings from the object file and add it to Route Info list.
     private void getDataFromJsonString(String response) {
         try {
 
@@ -119,6 +124,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Once we convert the data into List we add that data to the db by calling the below method
+
+    private void setDataInDb(List<RouteInfo> routeInfoList) {
+        if (routeInfoList != null && routeInfoList.size() > 0) {
+            new CompositeDisposable().add(LocalCacheManager.getInstance(this).insertRouteInfoList(routeInfoList)
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        preferenceHelper.setIsRouteDataAvailable(true);
+                        getDataFromDb();
+                    }, throwable -> {
+                        setNoDataAvailable();
+                    }));
+        }
+    }
+
+
+    // This method is use for getting then data from db.
     private void getDataFromDb() {
         new CompositeDisposable().add(LocalCacheManager.getInstance(this).getRouteInfoList()
                 .subscribeOn(Schedulers.computation())
@@ -130,6 +153,8 @@ public class MainActivity extends AppCompatActivity {
                 }));
     }
 
+
+    //Once we get the data from db this method is called and the data is assigned to recyclerview. If data is not available "No Data Visible" will be shown.
     private void setDataToRecyclerView(List<RouteInfo> routeInfoList) {
         if (routeInfoList != null && routeInfoList.size() > 0) {
             linearLayoutManager = new LinearLayoutManager(this);
@@ -140,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
 
             progressBar.setVisibility(View.GONE);
             tripRecyclerView.setVisibility(View.VISIBLE);
-
 
             setHandlerForMinuteUpdate();
 
@@ -156,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         tvNoData.setVisibility(View.VISIBLE);
     }
 
+    // For minute by minute update I have used the below method using Handler.
     private void setHandlerForMinuteUpdate() {
         if (tripDataAdapter != null) {
             final Handler handler = new Handler();
@@ -170,17 +195,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setDataInDb(List<RouteInfo> routeInfoList) {
-        if (routeInfoList != null && routeInfoList.size() > 0) {
-            new CompositeDisposable().add(LocalCacheManager.getInstance(this).insertRouteInfoList(routeInfoList)
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(result -> {
-                        preferenceHelper.setIsRouteDataAvailable(true);
-                        getDataFromDb();
-                    }, throwable -> {
-                        setNoDataAvailable();
-                    }));
-        }
-    }
 }

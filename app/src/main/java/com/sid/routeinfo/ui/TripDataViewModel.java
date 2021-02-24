@@ -32,6 +32,7 @@ public class TripDataViewModel {
     public ObservableList<RouteTimeData> timingObservableList = new ObservableArrayList<>();
 
 
+    // Here we assign all the route info data to the itemView.
     public TripDataViewModel(RouteInfo routeInfo) {
         name = new ObservableField<>(routeInfo.getName());
         source = new ObservableField<>(routeInfo.getSource());
@@ -42,6 +43,20 @@ public class TripDataViewModel {
 
         isRouteTimingAvailable = new ObservableBoolean(false);
 
+        setRouteTimingList(routeInfo);
+    }
+
+    // Here we assign all the route timing data to the itemView.
+    public TripDataViewModel(RouteTimeData routeTimeData) {
+        startTime = new ObservableField<>(routeTimeData.getTripStartTime());
+        availSeats = new ObservableField<>(routeTimeData.getAvaiable() + "");
+        totalSeats = new ObservableField<>(routeTimeData.getTotalSeats() + "");
+    }
+
+
+    // Here we add data to Obseravble list to add sorted Route timing in Recyclerview
+    private void setRouteTimingList(RouteInfo routeInfo) {
+
         if (routeInfo.getRouteTimeDataList() != null && routeInfo.getRouteTimeDataList().size() > 0) {
             List<RouteTimeData> finalTimeDataList = getFutureTimeSortedList(routeInfo.getRouteTimeDataList());
 
@@ -51,15 +66,10 @@ public class TripDataViewModel {
                 isRouteTimingAvailable.set(true);
             }
         }
-
     }
 
-    public TripDataViewModel(RouteTimeData routeTimeData) {
-        startTime = new ObservableField<>(routeTimeData.getTripStartTime());
-        availSeats = new ObservableField<>(routeTimeData.getAvaiable() + "");
-        totalSeats = new ObservableField<>(routeTimeData.getTotalSeats() + "");
-    }
 
+    // Here we make a list which contains all the route time which is after the current time.
     private List<RouteTimeData> getFutureTimeSortedList(List<RouteTimeData> routeTimeDataList) {
 
         List<RouteTimeData> finalList = new ArrayList<>();
@@ -73,6 +83,8 @@ public class TripDataViewModel {
         return finalList;
     }
 
+
+    // Here we check the Start Time is after the Current Time or Not
     private Boolean isEligibleForFutureTiming(String startTime) {
         try {
             long currentTime = System.currentTimeMillis();
