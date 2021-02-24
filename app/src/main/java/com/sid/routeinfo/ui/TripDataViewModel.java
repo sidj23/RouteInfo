@@ -91,13 +91,11 @@ public class TripDataViewModel {
             Date currentDate = new Date(currentTime);
             Calendar currentCalendar = Calendar.getInstance();
             currentCalendar.setTime(currentDate);
-            currentCalendar.add(Calendar.DATE, 1);
 
             Date startTimeDate = new SimpleDateFormat("HH:mm").parse(startTime);
             Calendar startTimeCalendar = Calendar.getInstance();
             startTimeCalendar.setTime(startTimeDate);
             startTimeCalendar.set(currentCalendar.get(Calendar.YEAR), currentCalendar.get(Calendar.MONTH), currentCalendar.get(Calendar.DAY_OF_MONTH));
-            startTimeCalendar.add(Calendar.DATE, 1);
 
             return startTimeCalendar.getTime().after(currentCalendar.getTime());
         } catch (Exception e) {
